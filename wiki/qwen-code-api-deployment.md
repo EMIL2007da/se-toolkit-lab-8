@@ -61,7 +61,7 @@ Complete these steps:
    Already up to date.
    ```
 
-2. [Hard reset the branch `main`](./git-vscode.md#hard-reset-the-branch).
+2. [Hard reset the branch `main`](./git-vscode.md#hard-reset-the-branch-branch).
 
 ### Prepare the environment in the `Qwen Code` API repository (REMOTE)
 

@@ -37,7 +37,7 @@ Outline:
 
 ## Switch to the `main` branch
 
-[Switch to the `main` branch](./git-vscode.md#switch-to-the-branch) in `VS Code`.
+[Switch to the `main` branch](./git-vscode.md#switch-to-the-branch-branch) in `VS Code`.
 
 ## Pull changes from `main` on `origin`
 

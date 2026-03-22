@@ -6,9 +6,9 @@
 - [Clone the repository](#clone-the-repository)
   - [Clone the repository using the `VS Code Terminal`](#clone-the-repository-using-the-vs-code-terminal)
   - [Clone the repository using the `Command Palette`](#clone-the-repository-using-the-command-palette)
-- [Switch to the `<branch>`](#switch-to-the-branch)
-  - [Switch to the `<branch>` using the `VS Code Terminal`](#switch-to-the-branch-using-the-vs-code-terminal)
-  - [Switch to the `<branch>` using `GitLens`](#switch-to-the-branch-using-gitlens)
+- [Switch to the branch `<branch>`](#switch-to-the-branch-branch)
+  - [Switch to the branch `<branch>` using the `VS Code Terminal`](#switch-to-the-branch-branch-using-the-vs-code-terminal)
+  - [Switch to the branch `<branch>` using `GitLens`](#switch-to-the-branch-branch-using-gitlens)
 - [Switch to a new branch](#switch-to-a-new-branch)
   - [Switch to a new branch using `GitHub`](#switch-to-a-new-branch-using-github)
   - [Switch to a new branch using the `VS Code Terminal`](#switch-to-a-new-branch-using-the-vs-code-terminal)
@@ -17,15 +17,15 @@
 - [Detect conflicts](#detect-conflicts)
   - [Detect conflicts using the `VS Code Terminal`](#detect-conflicts-using-the-vs-code-terminal)
   - [Detect conflicts using `GitLens`](#detect-conflicts-using-gitlens)
-- [Hard reset the `<branch>`](#hard-reset-the-branch)
+- [Hard reset the branch `<branch>`](#hard-reset-the-branch-branch)
 - [Resolve a merge conflict](#resolve-a-merge-conflict)
   - [Resolve a merge conflict using `VS Code`](#resolve-a-merge-conflict-using-vs-code)
   - [Resolve a merge conflict using `GitLens`](#resolve-a-merge-conflict-using-gitlens)
   - [Resolve a merge conflict using the `VS Code Terminal`](#resolve-a-merge-conflict-using-the-vs-code-terminal)
-- [Pull changes from the `<branch>` on `<remote>`](#pull-changes-from-the-branch-on-remote)
-  - [Pull changes from `<branch>` on `<remote>` using the `VS Code Terminal`](#pull-changes-from-branch-on-remote-using-the-vs-code-terminal)
-  - [Pull changes from `<branch>` on `<remote>` using `GitLens`](#pull-changes-from-branch-on-remote-using-gitlens)
-- [Pull changes from `<branch>` on `<remote>` and rebase](#pull-changes-from-branch-on-remote-and-rebase)
+- [Pull changes from the branch `<branch>` on `<remote>`](#pull-changes-from-the-branch-branch-on-remote)
+  - [Pull changes from the branch `<branch>` on `<remote>` using the `VS Code Terminal`](#pull-changes-from-the-branch-branch-on-remote-using-the-vs-code-terminal)
+  - [Pull changes from the branch `<branch>` on `<remote>` using `GitLens`](#pull-changes-from-the-branch-branch-on-remote-using-gitlens)
+- [Pull changes from the branch `<branch>` on `<remote>` and rebase](#pull-changes-from-the-branch-branch-on-remote-and-rebase)
   - [Pull and rebase using the `VS Code Terminal`](#pull-and-rebase-using-the-vs-code-terminal)
   - [Pull and rebase using `GitLens`](#pull-and-rebase-using-gitlens)
 - [Stage changes using the `Source Control`](#stage-changes-using-the-source-control)
@@ -120,15 +120,15 @@ Docs:
 6. Choose a directory where to clone the repository.
 7. Confirm the choice.
 
-## Switch to the `<branch>`
+## Switch to the branch `<branch>`
 
 <!-- no toc -->
-- Method 1: [Switch to the `<branch>` using the `VS Code Terminal`](#switch-to-the-branch-using-the-vs-code-terminal)
-- Method 2: [Switch to the `<branch>` using `GitLens`](#switch-to-the-branch-using-gitlens)
+- Method 1: [Switch to the branch `<branch>` using the `VS Code Terminal`](#switch-to-the-branch-branch-using-the-vs-code-terminal)
+- Method 2: [Switch to the branch `<branch>` using `GitLens`](#switch-to-the-branch-branch-using-gitlens)
 
-### Switch to the `<branch>` using the `VS Code Terminal`
+### Switch to the branch `<branch>` using the `VS Code Terminal`
 
-1. To switch to the `<branch>`,
+1. To switch to the branch `<branch>`,
 
    [run in the `VS Code Terminal`](./vs-code.md#run-a-command-in-the-vs-code-terminal):
 
@@ -144,11 +144,11 @@ Docs:
    git switch main
    ```
 
-### Switch to the `<branch>` using `GitLens`
+### Switch to the branch `<branch>` using `GitLens`
 
 1. [Run using the `Command Palette`](./vs-code.md#run-a-command-using-the-command-palette):
    `GitLens: Git Switch to..`.
-2. [Select](./vs-code.md#select-an-option-from-a-list) the `<branch>`.
+2. [Select](./vs-code.md#select-an-option-from-a-list) the branch `<branch>`.
 
 ## Switch to a new branch
 
@@ -199,7 +199,7 @@ Docs:
 
 ## Fetch the latest changes using the `VS Code Terminal`
 
-1. [Switch to the `<branch>`](#switch-to-a-new-branch-using-the-vs-code-terminal).
+1. [Switch to the branch `<branch>`](#switch-to-a-new-branch-using-the-vs-code-terminal).
 
 2. To fetch the latest changes from `<remote>`,
 
@@ -222,7 +222,7 @@ Docs:
 
 ## Detect conflicts
 
-It can happen that commits in [`<branch>`](./git.md#branch) on [`<remote>`](./git.md#remote-placeholder) are different from commits on the `<branch>` in the cloned repo on your computer.
+It can happen that commits in [`<branch>`](./git.md#branch) on [`<remote>`](./git.md#remote-placeholder) are different from commits on the branch `<branch>` in the cloned repo on your computer.
 
 - Method 1: [Detect conflicts using `GitLens`](#detect-conflicts-using-gitlens)
 - Method 2: [Detect conflicts using the `VS Code Terminal`](#detect-conflicts-using-the-vs-code-terminal)
@@ -231,7 +231,7 @@ It can happen that commits in [`<branch>`](./git.md#branch) on [`<remote>`](./gi
 
 1. [Fetch the latest changes using the `VS Code Terminal`](#fetch-the-latest-changes-using-the-vs-code-terminal).
 
-2. To compare the local [`<branch>`](./git.md#branch-placeholder) with the `<branch>` on `<remote>`,
+2. To compare the local [`<branch>`](./git.md#branch-placeholder) with the branch `<branch>` on `<remote>`,
 
    [run in the `VS Code Terminal`](./vs-code.md#run-a-command-in-the-vs-code-terminal):
 
@@ -247,20 +247,20 @@ It can happen that commits in [`<branch>`](./git.md#branch) on [`<remote>`](./gi
 
    <img alt="Commit Conflict" src="./images/vs-code/status-bar-commit-conflict.png" style="width:400px"></img>
 
-   You should see that there is a non-zero number of commits to pull from `<branch>` on `<remote>`.
+   You should see that there is a non-zero number of commits to pull from the branch `<branch>` on `<remote>`.
 
-## Hard reset the `<branch>`
+## Hard reset the branch `<branch>`
 
 > [!NOTE]
 >
-> This operation will make your local `<branch>` match the `<branch>` on `<remote>`.
+> This operation will make the local branch `<branch>` match the branch `<branch>` on `<remote>`.
 
 > [!CAUTION]
 > This operation discards all uncommitted changes and local commits that are not on the [`<remote>`](./git.md#remote-placeholder).
 
 1. [Fetch the latest changes](#fetch-the-latest-changes-using-the-vs-code-terminal).
 
-2. To hard reset the local `<branch>`,
+2. To hard reset the local branch `<branch>`,
 
    [run in the `VS Code Terminal`](./vs-code.md#run-a-command-in-the-vs-code-terminal):
 
@@ -371,18 +371,18 @@ For each conflicting file, complete the following steps:
    git merge --continue
    ```
 
-## Pull changes from the `<branch>` on `<remote>`
+## Pull changes from the branch `<branch>` on `<remote>`
 
 > [!NOTE]
 > See [`<branch>`](./git.md#branch), [`<remote>`](./git.md#remote-placeholder).
 
 <!-- no toc -->
-- Method 1: [Pull changes from `<branch>` on `<remote>` using the `VS Code Terminal`](#pull-changes-from-branch-on-remote-using-the-vs-code-terminal)
-- Method 2: [Pull changes from `<branch>` on `<remote>` using `GitLens`](#pull-changes-from-branch-on-remote-using-gitlens)
+- Method 1: [Pull changes from the branch `<branch>` on `<remote>` using the `VS Code Terminal`](#pull-changes-from-the-branch-branch-on-remote-using-the-vs-code-terminal)
+- Method 2: [Pull changes from the branch `<branch>` on `<remote>` using `GitLens`](#pull-changes-from-the-branch-branch-on-remote-using-gitlens)
 
-### Pull changes from `<branch>` on `<remote>` using the `VS Code Terminal`
+### Pull changes from the branch `<branch>` on `<remote>` using the `VS Code Terminal`
 
-1. To pull changes from `<branch>` on `<remote>`,
+1. To pull changes from the branch `<branch>` on `<remote>`,
 
    [run in the `VS Code Terminal`](./vs-code.md#run-a-command-in-the-vs-code-terminal):
 
@@ -396,12 +396,12 @@ For each conflicting file, complete the following steps:
    git pull origin main
    ```
 
-### Pull changes from `<branch>` on `<remote>` using `GitLens`
+### Pull changes from the branch `<branch>` on `<remote>` using `GitLens`
 
 1. [Run using the `Command Palette`](./vs-code.md#run-a-command-using-the-command-palette):
    `GitLens: Pull`.
 
-## Pull changes from `<branch>` on `<remote>` and rebase
+## Pull changes from the branch `<branch>` on `<remote>` and rebase
 
 <!-- no toc -->
 - Method 1: [Pull and rebase using the `VS Code Terminal`](#pull-and-rebase-using-the-vs-code-terminal)
@@ -409,7 +409,7 @@ For each conflicting file, complete the following steps:
 
 ### Pull and rebase using the `VS Code Terminal`
 
-1. To pull changes from `<branch>` on `<remote>` and rebase onto it,
+1. To pull changes from the branch `<branch>` on `<remote>` and rebase onto it,
 
    [run in the `VS Code Terminal`](./vs-code.md#run-a-command-in-the-vs-code-terminal):
 

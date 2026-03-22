@@ -332,7 +332,7 @@ A placeholder for the name of the [compare branch](#compare-branch).
 
 1. [Go to your fork](#go-to-your-fork).
 2. Click `main` under the repo name to view all branches.
-3. Click `<branch>` that you want to use for PR.
+3. Click the branch `<branch>` that you want to use for PR.
 4. You'll see the `Contribute` button if the branch has commits that aren't yet in the `main` branch.
 5. Click `Contribute`.
 6. Click `Open pull request`.
@@ -616,7 +616,7 @@ Option 1: Remove it.
 
 2. Clone again.
 
-Option 2: Update the `<branch>`.
+Option 2: Update the branch `<branch>`.
 
 1. To enter the directory at `<directory-path>`,
 
@@ -628,4 +628,4 @@ Option 2: Update the `<branch>`.
 
    Replace the placeholder [`<directory-path>`](./file-system.md#directory-path-placeholder) with the path from the error message (without `<` and `>`).
 
-2. [Hard reset the `<branch>`](./git-vscode.md#hard-reset-the-branch).
+2. [Hard reset the branch `<branch>`](./git-vscode.md#hard-reset-the-branch-branch).
