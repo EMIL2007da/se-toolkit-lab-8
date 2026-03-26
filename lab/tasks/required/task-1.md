@@ -46,7 +46,7 @@ Start by reading the [official nanobot repository](https://github.com/HKUDS/nano
 
    This generates `~/.nanobot/config.json` and a workspace at `~/.nanobot/workspace`.
 
-4. Chat with the agent in the terminal:
+4. Chat with the agent in the terminal on your VM:
 
    ```terminal
    nanobot agent
@@ -92,7 +92,7 @@ The same MCP server works with any agent that speaks MCP — nanobot, Claude, Cu
 
 ### What to do
 
-The LMS MCP server is provided in `mcp/mcp_lms/`. It exposes the backend API as tools: `lms_health`, `lms_labs`, `lms_scores`, `lms_pass_rates`, etc.
+The LMS MCP server is provided in `mcp/mcp_lms/`. It exposes the backend API as tools: `lms_health`, `lms_labs`, `lms_pass_rates`, etc.
 
 1. Install the MCP server as a dependency so nanobot can find it:
 
@@ -102,12 +102,16 @@ The LMS MCP server is provided in `mcp/mcp_lms/`. It exposes the backend API as 
 
 2. Add the MCP server to your nanobot config (`~/.nanobot/config.json`). Check the [nanobot docs](https://github.com/HKUDS/nanobot) for how to configure MCP servers. It runs as a subprocess via `python -m mcp_lms`.
 
-   > **Hint:** The MCP server needs the backend URL. You can set it as an environment variable: `NANOBOT_LMS_BACKEND_URL=http://localhost:42002`
+   > **Hint:** The MCP server needs the backend URL and backend API key. Set them as environment variables:
+   > `NANOBOT_LMS_BACKEND_URL=http://localhost:42002`
+   > `NANOBOT_LMS_API_KEY=...`
+   >
+   > The LMS key stays on the agent side. Later, the web client will use a separate `NANOBOT_ACCESS_KEY`, not the backend key.
 
 3. Test with the agent:
 
    ```terminal
-   NANOBOT_LMS_BACKEND_URL=http://localhost:42002 nanobot agent -m "What labs are available?"
+   NANOBOT_LMS_BACKEND_URL=http://localhost:42002 NANOBOT_LMS_API_KEY=YOUR_LMS_API_KEY nanobot agent -m "What labs are available?"
    ```
 
    The agent should now call the MCP tools and return **real lab names** from the backend.
@@ -115,7 +119,7 @@ The LMS MCP server is provided in `mcp/mcp_lms/`. It exposes the backend API as 
 4. Try a more complex question:
 
    ```terminal
-   NANOBOT_LMS_BACKEND_URL=http://localhost:42002 nanobot agent -m "Which lab has the lowest pass rate?"
+   NANOBOT_LMS_BACKEND_URL=http://localhost:42002 NANOBOT_LMS_API_KEY=YOUR_LMS_API_KEY nanobot agent -m "Which lab has the lowest pass rate?"
    ```
 
    The agent should chain multiple tool calls to figure this out.
@@ -150,6 +154,7 @@ The agent works, but it could be smarter about *how* it uses tools. A **skill pr
    - When a lab parameter is needed and not provided, ask the user which lab
    - Format numeric results nicely (percentages, counts)
    - Keep responses concise
+   - When the user asks "what can you do?", explain its current tools and limits clearly
 
    > **Hint:** Look at the tools in `mcp/mcp_lms/server.py` to see what's available and what parameters each tool needs.
 

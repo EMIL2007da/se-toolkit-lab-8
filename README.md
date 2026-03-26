@@ -8,11 +8,15 @@
 >
 > Set it up from scratch. Wire it into the system. Then extend it with observability tools so it can answer questions about system health too.
 
+> [!IMPORTANT]
+> Do this lab on your VM, ideally through `VS Code` Remote-SSH. Do not install or run `nanobot` on your main machine.
+
 ## What you will learn
 
 By the end of this lab, you should be able to say:
 
 > 1. I can explain what makes an AI agent different from a regular client like a web app or a bot.
+>    It is not just a self-hosted chat window: it has tools, skills, memory, and can act proactively.
 > 2. I set up nanobot from scratch — created the project, installed the framework, connected it to the Qwen API, wired it into Docker Compose, and talked to it.
 > 3. I saw what a bare agent does without tools (hallucinates) vs. with MCP tools (answers correctly) — and I understand why.
 > 4. I built MCP tools that let the agent query logs and traces, turning observability data into a conversational interface.
@@ -72,8 +76,8 @@ What you start with                    What you add
 
 | Service | What it does | When |
 |---------|-------------|------|
-| **nanobot** | AI agent — receives chat via WebSocket, reasons with LLM, calls backend via MCP tools | Task 1 |
-| **client-web-flutter** | Chat UI at `/flutter` — talk to the agent in a browser | Task 1 |
+| **nanobot** | AI agent — receives chat via WebSocket, reasons with LLM, calls backend via MCP tools | Tasks 1-2 |
+| **client-web-flutter** | Chat UI at `/flutter` — talk to the agent in a browser, protected by a student-chosen access key | Task 2 |
 | Observability MCP tools | Agent can query logs and traces | Task 3 |
 | Cron health check | Agent reports system health on a schedule | Task 5 |
 

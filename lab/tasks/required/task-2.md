@@ -2,7 +2,7 @@
 
 ## Background
 
-In Task 1 you installed nanobot, connected it to the Qwen API and the LMS backend, and chatted with it in the terminal via `nanobot agent`. That's great for development, but users need a web interface.
+In Task 1 you installed nanobot, connected it to the Qwen API and the LMS backend, and chatted with it in the terminal on your VM via `nanobot agent`. That's great for development, but users need a web interface.
 
 There's a problem: **Telegram is blocked from Russian servers.** Your university VM can't reach `api.telegram.org`. So instead of a Telegram bot, we use a **WebSocket bridge** — a custom nanobot channel plugin that accepts connections over WebSocket. Any web app can connect to it. This is a real-world pattern: when a platform is blocked, you build an alternative transport.
 
@@ -13,7 +13,7 @@ In this task you:
 
 ## Part A — Deploy nanobot as a Docker service
 
-In Task 1 you ran `nanobot agent` locally. For production, nanobot runs as `nanobot gateway` — a persistent service that listens for connections from channels (WebSocket, Telegram, etc.).
+In Task 1 you ran `nanobot agent` from the VM terminal. For production, nanobot runs as `nanobot gateway` — a persistent service that listens for connections from channels (WebSocket, Telegram, etc.).
 
 ### What to do
 
@@ -21,7 +21,7 @@ In Task 1 you ran `nanobot agent` locally. For production, nanobot runs as `nano
 
    - **`entrypoint.py`** — resolves environment variables (LLM API key, host/port, backend URL) into the config at runtime, then launches `nanobot gateway`. This is needed because Docker passes config via env vars, not by editing files.
 
-     > **Hint:** Read `config.json`, inject env var values for provider API key/base URL, gateway host/port, webchat host/port, and MCP server env vars. Write a resolved config. Then `os.execvp("nanobot", ["nanobot", "gateway", "--config", resolved, "--workspace", workspace])`.
+     > **Hint:** Read `config.json`, inject env var values for provider API key/base URL, gateway host/port, webchat host/port, and MCP server env vars (backend URL plus backend API key). Write a resolved config. Then `os.execvp("nanobot", ["nanobot", "gateway", "--config", resolved, "--workspace", workspace])`.
 
    - **`Dockerfile`** — multi-stage build with `uv` (same pattern as `backend/Dockerfile`). Final CMD: `python /app/nanobot/entrypoint.py`.
 
@@ -29,7 +29,7 @@ In Task 1 you ran `nanobot agent` locally. For production, nanobot runs as `nano
 
    Use main's nanobot service as reference — it needs:
    - Build context `./nanobot` with `additional_contexts: workspace: .` (so it can access `mcp/` and root `pyproject.toml`)
-   - Environment variables for LLM provider, gateway, webchat, and backend URL
+   - Environment variables for LLM provider, gateway, webchat, backend URL, and backend API key
    - `depends_on: backend`
    - Network: `lms-network`
 
@@ -77,8 +77,11 @@ In Task 1 you ran `nanobot agent` locally. For production, nanobot runs as `nano
 Nanobot doesn't ship with a WebSocket channel — it has Telegram, Discord, WhatsApp, etc. but no raw WebSocket. We built a custom channel plugin (`nanobot_webchat`) that adds this capability, and a Flutter web app that connects to it.
 
 Both are in a single repository. The webchat plugin handles:
-- WebSocket connections with per-session API key injection (`?api_key=...` query param → `[LMS_API_KEY=...]` prefix in messages)
-- Structured response rendering (choice buttons, confirm dialogs, composite messages)
+- WebSocket connections protected by a deployment access key (`?access_key=...` query param, validated against `NANOBOT_ACCESS_KEY`)
+- Structured response rendering when you want it (`choice`, `confirm`, `composite`)
+
+> [!NOTE]
+> Keep the client generic. Buttons/chips are optional. A clear welcome message and a good first prompt are more important than fancy UI.
 
 ### What to do
 
@@ -131,7 +134,10 @@ Both are in a single repository. The webchat plugin handles:
    }
    ```
 
-6. Redeploy and open `http://localhost:42002/flutter` in a browser. Log in with your `LMS_API_KEY`. Chat with the agent.
+6. Redeploy and open `http://localhost:42002/flutter` in a browser. Log in with your `NANOBOT_ACCESS_KEY`. Start by asking the agent:
+
+   - `What can you do in this system?`
+   - One quiz or LMS/system question of your choice
 
 <!-- STOP -->
 > [!CAUTION]
@@ -145,7 +151,7 @@ Both are in a single repository. The webchat plugin handles:
 ### Checkpoint
 
 1. Open `http://localhost:42002/flutter` — you should see a login screen.
-2. Log in and ask the agent a question from the quiz question bank.
+2. Log in with your `NANOBOT_ACCESS_KEY`, ask `What can you do in this system?`, then ask one question from the quiz question bank.
 3. Screenshot the conversation and add it to `REPORT.md` under `## Task 2B — Web client`.
 
 ---
@@ -155,5 +161,5 @@ Both are in a single repository. The webchat plugin handles:
 - Nanobot runs as a Docker Compose service via `nanobot gateway`.
 - The WebSocket endpoint at `/ws/chat` responds.
 - The webchat channel plugin is installed and the Flutter client connects through it.
-- The Flutter web client is accessible at `/flutter`.
+- The Flutter web client is accessible at `/flutter` and protected by a student-chosen `NANOBOT_ACCESS_KEY`.
 - `REPORT.md` contains responses from both checkpoints.

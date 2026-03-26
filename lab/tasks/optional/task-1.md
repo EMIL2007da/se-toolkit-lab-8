@@ -4,7 +4,7 @@
 
 The Flutter web client connects to nanobot via the WebSocket channel. A Telegram bot is another client that connects the same way — demonstrating that **the agent is the interface, not any particular frontend**. Same agent, same tools, same answers — different client.
 
-The Telegram bot code is in the `nanobot-websocket-channel` repo you added in Task 2 (at `nanobot-websocket-channel/client-telegram-bot/`). It connects to nanobot via WebSocket and relays messages between Telegram users and the agent.
+The Telegram bot code is in the `nanobot-websocket-channel` repo you added in Task 2 (at `nanobot-websocket-channel/client-telegram-bot/`). It connects to nanobot via WebSocket and relays messages between Telegram users and the agent. Unlike the web client, you can keep the Telegram bot LMS-specific if you want a `/login` flow there.
 
 ### Note on Telegram in Russia
 

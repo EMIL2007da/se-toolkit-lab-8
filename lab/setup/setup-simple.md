@@ -8,11 +8,11 @@
     - [1.1.4. Add a classmate as a collaborator](#114-add-a-classmate-as-a-collaborator)
     - [1.1.5. Protect your `main` branch](#115-protect-your-main-branch)
   - [1.2. Clone your fork and set up the environment](#12-clone-your-fork-and-set-up-the-environment)
-  - [1.3. Stop Lab 7 services](#13-stop-lab-7-services)
-  - [1.4. Start the services locally](#14-start-the-services-locally)
+  - [1.3. Stop Lab 7 services on your VM](#13-stop-lab-7-services-on-your-vm)
+  - [1.4. Start the services on your VM](#14-start-the-services-on-your-vm)
   - [1.5. Populate the database](#15-populate-the-database)
-  - [1.6. Verify the local deployment](#16-verify-the-local-deployment)
-  - [1.7. Deploy to your VM](#17-deploy-to-your-vm)
+  - [1.6. Verify the deployment on your VM](#16-verify-the-deployment-on-your-vm)
+  - [1.7. Keep the deployment on your VM](#17-keep-the-deployment-on-your-vm)
   - [1.8. Set up SSH for the autochecker](#18-set-up-ssh-for-the-autochecker)
   - [1.9. Set up LLM access (Qwen Code API)](#19-set-up-llm-access-qwen-code-api)
   - [1.10. Coding agent](#110-coding-agent)
@@ -26,6 +26,9 @@
 
 > [!IMPORTANT]
 > In this lab, you start with only the **base LMS system** (backend, database, dashboard). You will add the AI agent, chat clients, and observability tools **during the tasks** — not during setup. The setup just gets the foundation running.
+
+> [!IMPORTANT]
+> Do the whole lab on your **VM**. Open the repo over `VS Code` Remote-SSH and run every command there. When this guide says `localhost`, it means the VM itself or a forwarded port from that VM. Do not install or run `nanobot` on your main machine.
 
 > [!NOTE]
 > This lab needs your university email and GitHub alias in the Autochecker bot <https://t.me/auchebot>. If you haven't registered, do so now. If you want to change something, contact your TA or try `/reset` in the autochecker bot.
@@ -63,7 +66,7 @@ We refer to your fork as `fork` and to the original repo as `upstream`.
 
 ### 1.2. Clone your fork and set up the environment
 
-1. Clone your fork to your local machine:
+1. [Connect to your VM](../../wiki/vm-access.md#connect-to-the-vm-as-the-user-user-local) and clone your fork there:
 
    ```terminal
    git clone --recurse-submodules https://github.com/YOUR_GITHUB_USERNAME/se-toolkit-lab-8
@@ -74,7 +77,7 @@ We refer to your fork as `fork` and to the original repo as `upstream`.
    > [!NOTE]
    > The `--recurse-submodules` flag clones the Qwen Code API [submodule](../../wiki/git.md#submodule) included in the repository.
 
-2. Open the forked repo in `VS Code`.
+2. Open the forked repo in `VS Code` through `Remote-SSH`.
 
 3. Go to `VS Code Terminal`, [check that the current directory is `se-toolkit-lab-8`](../../wiki/shell.md#check-the-current-directory-is-directory-name), and install `Python` dependencies:
 
@@ -103,7 +106,7 @@ We refer to your fork as `fork` and to the original repo as `upstream`.
    > [!IMPORTANT]
    > The credentials must match your autochecker bot registration.
 
-6. Set `LMS_API_KEY` — this is the **backend API key** that protects your LMS endpoints (used for `Authorization: Bearer` in Swagger and the frontend). It is **not** the LLM key — that comes later.
+6. Set `LMS_API_KEY` — this is the **backend API key** that protects your LMS endpoints (used for `Authorization: Bearer` in Swagger and the React dashboard). It is **not** the Nanobot login password and it is **not** the LLM key.
 
    ```text
    LMS_API_KEY=set-it-to-something-and-remember-it
@@ -117,35 +120,28 @@ We refer to your fork as `fork` and to the original repo as `upstream`.
 
    If you don't have a Qwen API key yet, see [step 1.9](#19-set-up-llm-access-qwen-code-api).
 
-### 1.3. Stop Lab 7 services
+8. Set `NANOBOT_ACCESS_KEY` — this is the password that will protect the Nanobot web client in Task 2. There is **no default**. Choose your own value and remember it.
+
+   ```text
+   NANOBOT_ACCESS_KEY=set-your-own-private-password
+   ```
+
+### 1.3. Stop Lab 7 services on your VM
 
 > [!IMPORTANT]
 > Labs 7 and 8 use the same ports (42001–42005). You **must** stop Lab 7 containers before starting Lab 8.
 
-**Locally:**
-
 ```terminal
-cd ../se-toolkit-lab-7
-docker compose --env-file .env.docker.secret down
-cd ../se-toolkit-lab-8
-```
-
-**On your VM** (do this now so you don't forget):
-
-```terminal
-ssh YOUR_VM_USERNAME@YOUR_VM_IP
 cd ~/se-toolkit-lab-7
 docker compose --env-file .env.docker.secret down
 ```
 
-Replace **`YOUR_VM_USERNAME`** and **`YOUR_VM_IP`** with your values.
-
 > [!NOTE]
 > You must use `--env-file .env.docker.secret` — without it, `docker compose down` will fail because the compose file references required variables.
 
-### 1.4. Start the services locally
+### 1.4. Start the services on your VM
 
-1. (`Windows`/`macOS`) Make sure [Docker Desktop](../../wiki/docker.md#start-docker) is running.
+1. Make sure the [Docker daemon](../../wiki/docker.md#start-docker) is running on your VM.
 
 2. Start the services in the background:
 
@@ -178,6 +174,9 @@ Replace **`YOUR_VM_USERNAME`** and **`YOUR_VM_IP`** with your values.
    > `client-web-react` exits after copying its build output — that's normal. Caddy serves the static files.
    >
    > The observability services (VictoriaLogs, VictoriaTraces, OTel Collector) are part of the base system. You'll use them in Task 2.
+
+   > [!TIP]
+   > If you use `VS Code` Remote-SSH, forward port `42002` so `http://localhost:42002` opens in your local browser while the services keep running on the VM.
 
 > <h3>Troubleshooting</h3>
 >
@@ -262,7 +261,7 @@ The database starts empty. You need to run the ETL pipeline to populate it with 
 > [!IMPORTANT]
 > Without this step, all analytics endpoints return empty results and the agent will have no data to work with.
 
-### 1.6. Verify the local deployment
+### 1.6. Verify the deployment on your VM
 
 1. Open `http://localhost:42002/docs` in a browser.
 
@@ -270,7 +269,7 @@ The database starts empty. You need to run the ETL pipeline to populate it with 
 
 2. Open `http://localhost:42002/` in a browser.
 
-   You should see the React dashboard. Enter your API key to connect.
+   You should see the React dashboard. Enter your `LMS_API_KEY` to connect.
 
 3. Switch to the **Dashboard** tab.
 
@@ -288,86 +287,14 @@ The database starts empty. You need to run the ETL pipeline to populate it with 
 > If the dashboard shows no data or errors, make sure:
 >
 > - The ETL sync completed successfully (step 1.5)
-> - You entered the correct API key in the frontend
+> - You entered the correct `LMS_API_KEY` in the React dashboard
 > - Try selecting a different lab in the dropdown
 
-### 1.7. Deploy to your VM
+### 1.7. Keep the deployment on your VM
 
-The autochecker tests your deployment on your **VM**. You need to deploy the same services there.
+Keep the services running on your VM after setup. The autochecker will query that deployment during evaluation.
 
-1. [Connect to the VM](../../wiki/vm-access.md#connect-to-the-vm-as-the-user-user-local).
-
-2. Make sure Lab 7 is stopped (if you haven't done this in step 1.3):
-
-   ```terminal
-   cd ~/se-toolkit-lab-7 && docker compose --env-file .env.docker.secret down
-   cd ~
-   ```
-
-3. Clone your fork on the VM:
-
-   ```terminal
-   git clone --recurse-submodules https://github.com/YOUR_GITHUB_USERNAME/se-toolkit-lab-8 ~/se-toolkit-lab-8
-   ```
-
-   Replace **`YOUR_GITHUB_USERNAME`** with your GitHub username.
-
-4. Create the environment file:
-
-   ```terminal
-   cd ~/se-toolkit-lab-8
-   cp .env.docker.example .env.docker.secret
-   ```
-
-5. Edit `.env.docker.secret` — set the same credentials as in your local file:
-
-   ```terminal
-   nano .env.docker.secret
-   ```
-
-   Set `AUTOCHECKER_API_LOGIN`, `AUTOCHECKER_API_PASSWORD`, `LMS_API_KEY`, and `QWEN_CODE_API_KEY`.
-
-6. Configure Docker DNS (required on most university VMs):
-
-   ```terminal
-   echo '{"dns": ["8.8.8.8", "8.8.4.4", "1.1.1.1"]}' \
-     | jq \
-     | sudo tee /etc/docker/daemon.json
-   
-   sudo systemctl restart docker
-   ```
-
-   > [!NOTE]
-   > Without this, Docker builds will fail with `getaddrinfo EAI_AGAIN` errors because the university network DNS can't resolve external registries.
-
-7. Start the services:
-
-   ```terminal
-   docker compose --env-file .env.docker.secret up --build -d
-   ```
-
-   > <h3>Troubleshooting</h3>
-   >
-   > The same troubleshooting advice as when [starting the services locally](#14-start-the-services-locally).
-
-8. Populate the database:
-
-   ```terminal
-   curl -X POST http://localhost:42002/pipeline/sync -H "Authorization: Bearer YOUR_LMS_API_KEY" -H "Content-Type: application/json" -d '{}'
-   ```
-
-   Replace **`YOUR_LMS_API_KEY`** with the value you set in `.env.docker.secret`.
-
-9. Verify the deployment:
-
-   ```terminal
-   curl -s http://localhost:42002/items/ -H "Authorization: Bearer YOUR_LMS_API_KEY" | head -c 200
-   ```
-
-   You should see a JSON array of items.
-
-> [!IMPORTANT]
-> Keep the services running on your VM. The autochecker will query your deployment during evaluation.
+If you rebuild the stack later, use the same `.env.docker.secret` values, including your `NANOBOT_ACCESS_KEY`.
 
 ### 1.8. Set up SSH for the autochecker
 
