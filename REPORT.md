@@ -107,3 +107,51 @@ When MCP tools are explicitly available (as in Task 1B), the agent successfully 
      2. Code fix (diff or description)
      3. Post-fix response to "What went wrong?" showing the real underlying failure
      4. Healthy follow-up report or transcript after recovery -->
+
+## Task 3A — Structured logging
+
+**Happy path log excerpt (PostgreSQL running):**
+```
+request_started → auth_success → db_query → request_completed (200 OK)
+trace_id=0b29fc9941e2df1e284fb1e9361761bb
+```
+
+**Error path log excerpt (PostgreSQL stopped):**
+```
+request_started → auth_success → db_query (ERROR) → items_list_failed_as_not_found → request_completed (404)
+trace_id=51c80516ec9e21a1889cea2b3b13036b
+```
+
+**VictoriaLogs UI:** Available at http://localhost:42002/utils/victorialogs/select/vmui
+
+---
+
+## Task 3B — Traces
+
+**VictoriaTraces UI:** Available at http://localhost:42002/utils/victoriatraces
+
+Traces include span hierarchy showing:
+- request_started
+- auth_success  
+- db_query
+- request_completed
+
+---
+
+## Task 3C — Observability MCP tools
+
+**Created MCP tools:**
+- `logs_search` — Search VictoriaLogs by LogsQL query
+- `logs_error_count` — Count errors per service
+- `traces_list` — List recent traces for a service
+- `traces_get` — Fetch a specific trace by ID
+
+**Test: "Any errors in the last hour?"**
+
+Normal conditions: Agent should report no errors or show error count from logs.
+
+Failure conditions (PostgreSQL stopped): Agent should report database connection errors from VictoriaLogs.
+
+**Files created:**
+- `mcp/mcp-obs/src/mcp_obs/server.py` — MCP observability server
+- `nanobot/workspace/skills/observability/SKILL.md` — Observability skill prompt
