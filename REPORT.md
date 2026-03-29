@@ -120,38 +120,92 @@ System Investigation Result:
 
 ## Task 4B — Proactive health check
 
+**Note:** The LLM OAuth token expired during this lab, preventing function calling from working. The MCP cron server was created and registered successfully, but the agent cannot invoke tools without a working LLM.
+
 **Created MCP cron server:** `nanobot-websocket-channel/mcp-cron/`
+
+**Files created:**
+
+- `mcp-cron/src/mcp_cron/server.py` — MCP server with add/list/remove actions
+- `mcp-cron/src/mcp_cron/__main__.py` — Async entry point
+- `mcp-cron/pyproject.toml` — Package configuration
+- `nanobot/workspace/skills/cron/SKILL.md` — Cron skill documentation
+- `nanobot/workspace/AGENTS.md` — Updated with explicit cron tool instructions
 
 **Cron tool actions:**
 
 - `add` — Schedule a new job with cron schedule and command
-- `list` — List all scheduled jobs
+- `list` — List all scheduled jobs  
 - `remove` — Remove a job by ID
 
-**Health check job created:**
-
-- Schedule: `*/2 * * * *` (every 2 minutes)
-- Command: Check for backend errors in last 2 minutes, inspect trace if needed
-
-**Proactive health report:** (screenshot/transcript from Flutter chat)
+**Registration confirmed in nanobot logs:**
 
 ```
-[Pending — waiting for cron cycle to execute]
+MCP: registered tool 'mcp_cron_cron' from server 'cron'
+MCP server 'cron': connected, 1 tools registered
 ```
 
-**Status:** ⏳ IN PROGRESS — Cron MCP server deployed, testing scheduled jobs
+**Issue:** LLM OAuth token expired (`"status":"expired"` in health check). Agent responds with echo instead of invoking tools because function calling requires a working LLM.
+
+**Workaround:** For production use, refresh the Qwen OAuth token or configure a valid API key.
+
+**Status:** ⚠️ PARTIAL — MCP cron server implemented and registered, but LLM unavailable for function calling
 
 ## Task 4C — Bug fix and recovery
 
-**Root cause identified:** (pending investigation)
+**Root cause:**
+The planted bug was in `backend/src/lms_backend/routers/items.py` (lines 22-29). When `read_items()` failed due to database error (e.g., PostgreSQL down), the exception handler caught it and raised `HTTPException` with status code **404 "Items not found"** instead of **500 "Internal Server Error"**. This masked the real failure cause.
 
-**Code fix:** (pending)
+**Fix:**
+Modified the exception handler to:
 
-**Post-fix response:** (pending)
+1. Catch `SQLAlchemyError` separately from generic `Exception`
+2. Return HTTP 500 with actual error details instead of 404
+3. Log errors at ERROR level with error type and message
 
-**Healthy follow-up:** (pending)
+**Diff:**
 
-**Status:** ⏳ PENDING
+```python
+# Before (buggy):
+except Exception as exc:
+    logger.warning("items_list_failed_as_not_found", ...)
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Items not found",
+    ) from exc
+
+# After (fixed):
+except SQLAlchemyError as exc:
+    logger.error("items_list_failed", extra={"error": str(exc), ...})
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail=f"Database error: {str(exc)}",
+    ) from exc
+except Exception as exc:
+    logger.error("items_list_failed", extra={"error": str(exc), ...})
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail=f"Internal server error: {str(exc)}",
+    ) from exc
+```
+
+**Post-fix failure check (PostgreSQL stopped):**
+
+```bash
+$ curl http://localhost:42020/items/ -H "Authorization: Bearer 03273"
+{"detail":"Internal server error: [Errno -3] Temporary failure in name resolution"}
+# HTTP Status: 500 Internal Server Error
+```
+
+**Healthy follow-up (PostgreSQL running):**
+
+```bash
+$ curl http://localhost:42020/items/ -H "Authorization: Bearer 03273"
+[{"id":1,"title":"Lab 01 – Products, Architecture & Roles",...}, ...]
+# HTTP Status: 200 OK
+```
+
+**Status:** ✅ PASS — Bug fixed, system returns correct error codes
 
 ## Task 3A — Structured logging
 
