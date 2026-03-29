@@ -101,7 +101,7 @@ async def call_tool(name: str, arguments: dict):
             return [TextContent(type="text", text=summary)]
 
         else:
-            raise ValueError(f"Unknown tool: {name}")
+            return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
 
 async def main():
