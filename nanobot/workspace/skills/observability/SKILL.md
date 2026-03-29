@@ -1,6 +1,6 @@
 ---
 name: observability
-description: Use observability tools to query logs and traces
+description: Use observability tools to investigate failures and check system health
 always: true
 ---
 
@@ -11,32 +11,63 @@ You have access to observability tools for VictoriaLogs and VictoriaTraces.
 ## Available Tools
 
 **Log tools:**
-- `logs_search` — Search logs by LogsQL query
-- `logs_error_count` — Count errors per service
+- `logs_search` — Search logs by LogsQL query (e.g., `level:error`, `service="backend"`)
+- `logs_error_count` — Count errors per service in a time window
 
 **Trace tools:**
 - `traces_list` — List recent traces for a service
-- `traces_get` — Get a specific trace by ID
+- `traces_get` — Get a specific trace by ID to see full request flow
 
-## Strategy
+## Investigation Strategy
 
-### When user asks about errors or problems:
+### When user asks "What went wrong?" or "Check system health":
 
-1. **Search logs first** — Use `logs_search` with query like `level:error` or `service="backend"`
-2. **Check error count** — Use `logs_error_count` to see which services have errors
-3. **Find trace ID in logs** — Look for `trace_id=xxx` in log entries
-4. **Fetch the trace** — Use `traces_get` with the trace ID to see full request flow
-5. **Summarize** — Explain what went wrong concisely
+Follow this investigation flow **in order**:
 
-### Example queries:
+1. **Check error count first** — Call `logs_error_count(minutes=5)` to see which services have recent errors
+2. **Search error logs** — Call `logs_search` with `level:error` scoped to the failing service (e.g., `service="backend"`)
+3. **Extract trace ID** — From the error logs, find `trace_id=xxx` in the log entry
+4. **Fetch the trace** — Call `traces_get(trace_id="...")` to see the full request flow and span hierarchy
+5. **Synthesize findings** — Combine log evidence and trace evidence into a concise summary
 
-- "Any errors in the last hour?" → `logs_error_count(hours=1)`
-- "Show backend errors" → `logs_search(query='level:error AND service="backend"')`
-- "What happened in trace abc123?" → `traces_get(trace_id="abc123")`
+### Response format:
+
+When presenting findings, structure your answer:
+
+```
+**Summary:** One-sentence root cause
+
+**Log evidence:**
+- Service X logged error Y at time T
+- Key error message: "..."
+
+**Trace evidence:**
+- Trace shows request failed at span Z
+- Duration: Xms (abnormally high/timeout)
+
+**Root cause:** Database connection failed / service unavailable / etc.
+```
+
+### Example investigation flow:
+
+User: "What went wrong?"
+
+1. `logs_error_count(minutes=5)` → backend has 15 errors
+2. `logs_search(query='level:error AND service="backend"', limit=10)` → finds "db_query failed: connection refused"
+3. Extract `trace_id=51c80516...` from log
+4. `traces_get(trace_id="51c80516...")` → shows spans: request_started → auth_success → db_query (FAILED)
+5. **Response:** "The backend failed to connect to PostgreSQL. Logs show 'connection refused' errors. Trace 51c80516 shows the db_query span failed after 30s timeout."
+
+### Key patterns to recognize:
+
+- `db_query` + `error: connection refused` → PostgreSQL is down
+- `db_query` + `error: timeout` → Database overload or network issue
+- `items_list_failed_as_not_found` → Backend caught an exception but returned 404 (buggy error handling)
+- `request_started` without `request_completed` → Request crashed mid-flight
 
 ### Response style:
 
-- Be concise — summarize findings, don't dump raw JSON
-- Highlight key errors and their causes
-- If you find a trace ID, offer to fetch the full trace
-- Mention which service is affected
+- **Be concise** — summarize findings, don't dump raw JSON
+- **Cite both sources** — mention what logs show AND what traces confirm
+- **Name the root cause** — database down, timeout, exception handler bug, etc.
+- **Highlight discrepancies** — e.g., "Logs show DB failure but response was 404 — error handler is masking the real issue"

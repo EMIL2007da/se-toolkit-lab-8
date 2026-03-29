@@ -4,6 +4,7 @@ services:
       context: ./backend
       additional_contexts:
         workspace: .
+      
       args:
         REGISTRY_PREFIX_DOCKER_HUB: ${REGISTRY_PREFIX_DOCKER_HUB:-}
     restart: unless-stopped
@@ -92,12 +93,21 @@ services:
     volumes:
       - client-web-react:/output
 
+  # Task 2B — Flutter web client build service.
+  client-web-flutter:
+    build:
+      context: ./nanobot-websocket-channel/client-web-flutter
+      args:
+        REGISTRY_PREFIX_DOCKER_HUB: ${REGISTRY_PREFIX_DOCKER_HUB:-}
+        REGISTRY_PREFIX_GHCR: ${REGISTRY_PREFIX_GHCR:-}
+    volumes:
+      - client-web-flutter:/output
+
   # Task 2A — uncomment and adapt this service after you create repo-local nanobot/.
   nanobot:
     build:
-      context: ./nanobot
-      additional_contexts:
-        workspace: .
+      context: .
+      dockerfile: nanobot/Dockerfile
       args:
         REGISTRY_PREFIX_DOCKER_HUB: ${REGISTRY_PREFIX_DOCKER_HUB:-}
         APP_UID: ${HOST_UID:-1000}
@@ -139,17 +149,6 @@ services:
       - backend
       - qwen-code-api
       - otel-collector
-
-  # Task 2B — uncomment after you add nanobot-websocket-channel and want the Flutter build.
-  # client-web-flutter:
-  #   build:
-  #     context: ./nanobot-websocket-channel/client-web-flutter
-  #     args:
-  #       REGISTRY_PREFIX_DOCKER_HUB: ${REGISTRY_PREFIX_DOCKER_HUB:-}
-  #       REGISTRY_PREFIX_GHCR: ${REGISTRY_PREFIX_GHCR:-}
-  #   volumes:
-  #     - client-web-flutter:/output
-
   caddy:
     image: ${REGISTRY_PREFIX_DOCKER_HUB:-}caddy:2.11-alpine
     networks:
@@ -157,9 +156,9 @@ services:
     depends_on:
       - backend
       - client-web-react
-      # Task 2B — uncomment after you enable the Flutter build service above.
-      # - client-web-flutter
-      # Task 2A — uncomment after you enable the nanobot service above.
+      # Task 2B — Flutter build service.
+      - client-web-flutter
+      # Task 2A — nanobot service.
       - nanobot
       - qwen-code-api
       - victorialogs
@@ -178,9 +177,8 @@ services:
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
       - client-web-react:/srv/react:ro
-      # Task 2B — uncomment when you want Caddy to serve the Flutter build output.
-      # - client-web-flutter:/srv/flutter:ro
-
+      # Task 2B — Flutter build output mounted for Caddy to serve.
+      - client-web-flutter:/srv/flutter:ro
   qwen-code-api:
     build:
       context: ./qwen-code-api
@@ -233,8 +231,8 @@ services:
   # Optional Task 1 — uncomment after you add the Telegram client repo in Task 2.
   # client-telegram-bot:
   #   build:
-  #     context: ./nanobot-websocket-channel/client-telegram-bot
-  #     additional_contexts:
+  #     context: .-websocket-channel/client-telegram-bot
+  #     
   #       workspace: ./nanobot-websocket-channel
   #     dockerfile: Dockerfile
   #     args:
