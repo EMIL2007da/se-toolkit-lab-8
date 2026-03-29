@@ -1,0 +1,21 @@
+{
+    admin off
+}
+
+:80 {
+    route /flutter* {
+        root * /srv/flutter
+        try_files {path} /index.html
+        file_server
+    }
+    
+    route /ws/chat* {
+        reverse_proxy nanobot:8765 {
+            flush_interval -1
+        }
+    }
+    
+    route /health {
+        respond "OK" 200
+    }
+}
