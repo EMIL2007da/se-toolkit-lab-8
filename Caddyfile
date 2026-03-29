@@ -8,14 +8,35 @@
         try_files {path} /index.html
         file_server
     }
-    
+
     route /ws/chat* {
         reverse_proxy nanobot:8765 {
             flush_interval -1
         }
     }
-    
+
     route /health {
         respond "OK" 200
+    }
+
+    # Proxy all other API requests to backend
+    route /items* {
+        reverse_proxy backend:8000
+    }
+
+    route /learners* {
+        reverse_proxy backend:8000
+    }
+
+    route /interactions* {
+        reverse_proxy backend:8000
+    }
+
+    route /analytics* {
+        reverse_proxy backend:8000
+    }
+
+    route /pipeline* {
+        reverse_proxy backend:8000
     }
 }

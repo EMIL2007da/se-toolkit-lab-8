@@ -124,20 +124,23 @@ def main():
         webchat_mcp_env["NANOBOT_WEBCHAT_TOKEN"] = webchat_token
 
     # Cron MCP server for scheduled jobs
-    if "cron" not in config["tools"]["mcpServers"]:
-        config["tools"]["mcpServers"]["cron"] = {
-            "command": "python",
-            "args": ["-m", "mcp_cron"],
-            "env": {},
-        }
-
-    cron_env = config["tools"]["mcpServers"]["cron"].setdefault("env", {})
-    workspace_dir_env = os.environ.get("NANOBOT_WORKSPACE_DIR")
-
-    if workspace_dir_env:
-        cron_env["NANOBOT_WORKSPACE_DIR"] = workspace_dir_env
-    else:
-        cron_env["NANOBOT_WORKSPACE_DIR"] = str(workspace_dir)
+    # DISABLED: Nanobot has a built-in CronTool that properly handles session
+    # context (channel/chat_id) for delivering scheduled messages.
+    # The MCP server approach doesn't work because it lacks session context.
+    # if "cron" not in config["tools"]["mcpServers"]:
+    #     config["tools"]["mcpServers"]["cron"] = {
+    #         "command": "python",
+    #         "args": ["-m", "mcp_cron"],
+    #         "env": {},
+    #     }
+    #
+    # cron_env = config["tools"]["mcpServers"]["cron"].setdefault("env", {})
+    # workspace_dir_env = os.environ.get("NANOBOT_WORKSPACE_DIR")
+    #
+    # if workspace_dir_env:
+    #     cron_env["NANOBOT_WORKSPACE_DIR"] = workspace_dir_env
+    # else:
+    #     cron_env["NANOBOT_WORKSPACE_DIR"] = str(workspace_dir)
 
     # Write resolved config
     with open(resolved_path, "w") as f:
