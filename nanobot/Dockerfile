@@ -19,12 +19,13 @@ COPY mcp ./mcp/
 COPY nanobot-websocket-channel/nanobot-channel-protocol ./nanobot-websocket-channel/nanobot-channel-protocol/
 COPY nanobot-websocket-channel/nanobot-webchat ./nanobot-websocket-channel/nanobot-webchat/
 COPY nanobot-websocket-channel/mcp-webchat ./nanobot-websocket-channel/mcp-webchat/
+COPY nanobot-websocket-channel/mcp-cron ./nanobot-websocket-channel/mcp-cron/
 COPY nanobot-websocket-channel/pyproject.toml ./nanobot-websocket-channel/
 
 WORKDIR /app/nanobot
 
 # Create virtual environment and install dependencies
-# Install in order: protocol first, then webchat, then mcp-webchat, then mcp-obs, then nanobot
+# Install in order: protocol first, then webchat, then mcp-webchat, then mcp-cron, then mcp-obs, then nanobot
 # Note: We need to remove workspace source references before installing nanobot
 RUN uv venv /app/.venv && \
     cd /app/nanobot-websocket-channel/nanobot-channel-protocol && \
@@ -32,6 +33,8 @@ RUN uv venv /app/.venv && \
     cd /app/nanobot-websocket-channel/nanobot-webchat && \
     uv pip install --no-deps -e . && \
     cd /app/nanobot-websocket-channel/mcp-webchat && \
+    uv pip install --no-deps -e . && \
+    cd /app/nanobot-websocket-channel/mcp-cron && \
     uv pip install --no-deps -e . && \
     cd /app/mcp/mcp-lms && \
     uv pip install --no-deps -e . && \

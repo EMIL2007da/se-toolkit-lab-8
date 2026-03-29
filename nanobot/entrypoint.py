@@ -77,7 +77,7 @@ def main():
         config["tools"]["mcpServers"]["lms"] = {
             "command": "python",
             "args": ["-m", "mcp_lms"],
-            "env": {}
+            "env": {},
         }
 
     lms_env = config["tools"]["mcpServers"]["lms"].setdefault("env", {})
@@ -94,7 +94,7 @@ def main():
         config["tools"]["mcpServers"]["observability"] = {
             "command": "python",
             "args": ["-m", "mcp_obs"],
-            "env": {}
+            "env": {},
         }
 
     obs_env = config["tools"]["mcpServers"]["observability"].setdefault("env", {})
@@ -111,7 +111,7 @@ def main():
         config["tools"]["mcpServers"]["webchat"] = {
             "command": "python",
             "args": ["-m", "mcp_webchat"],
-            "env": {}
+            "env": {},
         }
 
     webchat_mcp_env = config["tools"]["mcpServers"]["webchat"].setdefault("env", {})
@@ -123,6 +123,22 @@ def main():
     if webchat_token:
         webchat_mcp_env["NANOBOT_WEBCHAT_TOKEN"] = webchat_token
 
+    # Cron MCP server for scheduled jobs
+    if "cron" not in config["tools"]["mcpServers"]:
+        config["tools"]["mcpServers"]["cron"] = {
+            "command": "python",
+            "args": ["-m", "mcp_cron"],
+            "env": {},
+        }
+
+    cron_env = config["tools"]["mcpServers"]["cron"].setdefault("env", {})
+    workspace_dir_env = os.environ.get("NANOBOT_WORKSPACE_DIR")
+
+    if workspace_dir_env:
+        cron_env["NANOBOT_WORKSPACE_DIR"] = workspace_dir_env
+    else:
+        cron_env["NANOBOT_WORKSPACE_DIR"] = str(workspace_dir)
+
     # Write resolved config
     with open(resolved_path, "w") as f:
         json.dump(config, f, indent=2)
@@ -130,7 +146,17 @@ def main():
     print(f"Using config: {resolved_path}", file=sys.stderr)
 
     # Launch nanobot gateway
-    os.execvp("nanobot", ["nanobot", "gateway", "--config", str(resolved_path), "--workspace", str(workspace_dir)])
+    os.execvp(
+        "nanobot",
+        [
+            "nanobot",
+            "gateway",
+            "--config",
+            str(resolved_path),
+            "--workspace",
+            str(workspace_dir),
+        ],
+    )
 
 
 if __name__ == "__main__":
